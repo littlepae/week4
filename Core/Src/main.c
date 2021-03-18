@@ -113,36 +113,20 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	  if(Mode == 1)
-//	  {
-//		  Time = HAL_GetTick();
-//		  Check+=1;
-//		  while(1)
-//		  {
-//			 if(HAL_GetTick()-Time>=5000)
-//			 {
-//				Time = HAL_GetTick();
-//			 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
-//			 	break;
-//			 }
-//		  }
-//
-//	  }
 	  Time_now = HAL_GetTick();
-	  if(Mode == 1)
+	  if(Time != 0 && Time_count == 0)
 	  {
 		  if(HAL_GetTick() > Time_start)
 		  {
 			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
-			  Mode = 2;
 		  }
 	  }
-	  else if(Mode == 2)
+	  else
 	  {
 		  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_SET)
 		  {
-			  Time_count = Time_now - (Time_start);
-			  Mode = 3;
+			  Time_count = Time_now - Time_start;
+			  Time = 0;
 		  }
 	  }
 
@@ -357,32 +341,17 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-//		if(HAL_GetTick()-Time >=100)
-//		{
-//			Switch[0]= HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_13);
-//			if(Switch[0]==1 && Switch[1]==0)
-//			{
-//				Mode = 1;
-//				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
-//
-//			}
-//		}
 	if(GPIO_Pin == GPIO_PIN_13)
 		{
-			if(Mode == 0)
+			if(Time == 0)
 			{
 				HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 				Time = HAL_GetTick();
 				Time_start = Time + 1000 +((22695477* ADCData[0]) +ADCData[1]) % 10000;
-				Mode = 1;
+				Time_count = 0;
+//				Mode = 1;
 			}
 		}
-
-
-
-
-
-
 }
 /* USER CODE END 4 */
 
