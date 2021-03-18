@@ -348,17 +348,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 			{
 				HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 				Time = HAL_GetTick();
-//				Time_start = Time + 1000 +((22695477* ADCData[0]) +ADCData[1]) % 10000;
-				Time_start = Time + 5000;
+				Time_start = Time + 1000 +((22695477* ADCData[0]) +ADCData[1]) % 10000;
+//				Time_start = Time + 5000;
 				Mode = 1;
 			}
 			else if(Mode == 2)
 			{
-//				if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_SET)
-//				{
-					Time_count = Time_now - Time_start;
-					Mode = -1;
-//				}
+				Time_count = Time_now - Time_start;
+				Mode = -1;
 			}
 		}
 }
