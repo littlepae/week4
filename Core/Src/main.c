@@ -53,7 +53,7 @@ int Switch[2];
 uint32_t Time = 0;
 uint32_t Time_start = 0;
 uint32_t Time_count = 0;
-uint32_t Time_now = 10;
+uint32_t Time_now = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -114,21 +114,22 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  Time_now = HAL_GetTick();
-	  if(Time != 0 && Time_count == 0)
+	  if(Mode == 1)
 	  {
 		  if(HAL_GetTick() > Time_start)
 		  {
 			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+			  Mode = 2;
 		  }
 	  }
-	  else
-	  {
-		  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_SET)
-		  {
-			  Time_count = Time_now - Time_start;
-			  Time = 0;
-		  }
-	  }
+//	  else if(Mode == 2)
+//	  {
+//		  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_SET)
+//		  {
+//			  Time_count = Time_now - Time_start;
+//			  Mode = -1;
+//		  }
+//	  }
 
   }
   /* USER CODE END 3 */
@@ -201,13 +202,13 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   hadc1.Init.ScanConvMode = ENABLE;
-  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.NbrOfConversion = 4;
-  hadc1.Init.DMAContinuousRequests = ENABLE;
+  hadc1.Init.DMAContinuousRequests = DISABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
@@ -240,7 +241,7 @@ static void MX_ADC1_Init(void)
   }
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
-  sConfig.Channel = ADC_CHANNEL_VREFINT;
+  sConfig.Channel = ADC_CHANNEL_0;
   sConfig.Rank = 4;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
@@ -343,13 +344,21 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == GPIO_PIN_13)
 		{
-			if(Time == 0)
+			if(Mode == 0)
 			{
 				HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 				Time = HAL_GetTick();
-				Time_start = Time + 1000 +((22695477* ADCData[0]) +ADCData[1]) % 10000;
-				Time_count = 0;
-//				Mode = 1;
+//				Time_start = Time + 1000 +((22695477* ADCData[0]) +ADCData[1]) % 10000;
+				Time_start = Time + 5000;
+				Mode = 1;
+			}
+			else if(Mode == 2)
+			{
+//				if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_SET)
+//				{
+					Time_count = Time_now - Time_start;
+					Mode = -1;
+//				}
 			}
 		}
 }
